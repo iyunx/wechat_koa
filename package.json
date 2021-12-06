@@ -1,0 +1,53 @@
+{
+  "name": "koa",
+  "version": "1.0.0",
+  "description": "koa",
+  "main": "index.ts",
+  "scripts": {
+    "test": "jest",
+    "dev": "nodemon"
+  },
+  "keywords": [
+    "koa",
+    "ts"
+  ],
+  "author": "xl",
+  "license": "ISC",
+  "dependencies": {
+    "@alicloud/dysmsapi20170525": "^2.0.2",
+    "@alicloud/openapi-client": "^0.3.5",
+    "@alicloud/tea-typescript": "^1.7.2",
+    "@koa/cors": "^3.1.0",
+    "@types/ioredis": "^4.27.8",
+    "@types/jsonwebtoken": "^8.5.5",
+    "@types/koa": "^2.13.4",
+    "@types/koa-router": "^7.4.4",
+    "@types/koa-static": "^4.0.2",
+    "@types/koa__cors": "^3.0.3",
+    "@types/sequelize": "^4.28.10",
+    "async-validator": "^4.0.7",
+    "dotenv": "^10.0.0",
+    "ioredis": "^4.28.0",
+    "jsonwebtoken": "^8.5.1",
+    "koa": "^2.13.4",
+    "koa-body": "^4.2.0",
+    "koa-router": "^10.1.1",
+    "koa-static": "^5.0.0",
+    "log4js": "^6.3.0",
+    "moment": "^2.29.1",
+    "mysql2": "^2.3.2",
+    "pinyin-pro": "^3.3.1",
+    "sequelize": "^6.9.0",
+    "socket.io": "^4.4.0",
+    "validator": "^13.6.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.0.2",
+    "@types/node": "^16.11.6",
+    "jest": "^27.3.1",
+    "nodemon": "^2.0.14",
+    "ts-jest": "^27.0.7",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.2"
+  }
+}
