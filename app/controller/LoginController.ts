@@ -75,7 +75,7 @@ class LoginController {
     // 发送验证码 阿里云短信发送
     // let code = random(6, false)
     let sms = '8888'
-    // const ret = await sms.main([phone, '爱阆中', 'SMS_185555039', code])
+    // const ret = await sms.main([phone, '爱阆中', 'SMS_1859', code])
     // if(ret.body.code != 'OK') {
     //   return err(ctx, ret.body.message)
     // }

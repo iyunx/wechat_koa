@@ -23,8 +23,8 @@ const config = {
     // iv: '949c357d-e763-4495-a9b7-ccc5464e85a0'
   },
   sms: {
-    accessKeyId: 'LTAI4FjmQa5JZPPqyh7XHM2G',
-    accessKeySecret: 'q0RiS14wCXAT0eEtIui12G1qPm4KGB',
+    accessKeyId: '',
+    accessKeySecret: '',
     endpoint: 'dysmsapi.aliyuncs.com',
     apiVersion: '2017-05-25'
   }
