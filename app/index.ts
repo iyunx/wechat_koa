@@ -8,6 +8,9 @@ import { Server } from 'socket.io'
 import http from 'http'
 import socket from './libs/socket'
 import dotenv from 'dotenv'
+import moment from 'moment';
+import fs from 'fs'
+import { random } from '../utils';
 // 默认配置，自动获取根目录的.env内容
 dotenv.config({path: path.join(__dirname, '..', '/.env')});
 
@@ -49,7 +52,25 @@ app
   .use(KoaBody({
     multipart: true,
     formidable: {
-      uploadDir: path.join(__dirname, '..', 'uploads')
+      uploadDir: path.join(__dirname, '..', 'uploads'),
+      keepExtensions: true,
+      onFileBegin(name, file){
+        const info = ['image', 'video']
+        const num = info.indexOf(file.type.split('/')[0])
+        let pathInfo = 'images'
+        if(num == -1) pathInfo = 'files';
+        if(num == 1) pathInfo = 'video';
+
+        const dirName = moment().format('Y/M')
+        const dir = path.join(__dirname, `../uploads/${pathInfo}/${dirName}`)
+        
+        // 检查文件夹是否存在如果不存在则新建文件夹
+        !fs.existsSync(dir) && fs.mkdirSync(dir, {recursive: true})
+        // 后缀名
+        const etx = path.extname(file.name)
+        const fileName = 'wechat_' + moment().format('YMDhmmss') + '_' + random() + etx;
+        file.path = `${dir}/${fileName}`
+      }
     }
   }))
   .use(router.routes())

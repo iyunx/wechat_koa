@@ -1,7 +1,7 @@
 import { Context } from "koa";
 import { err, success } from "../libs";
 import redis from "../libs/redis";
-import { Contact, Room, User } from "../models";
+import { config, Contact, Room, User } from "../models";
 import RoomService from "../service/RoomService";
 
 class RoomController {
@@ -78,6 +78,35 @@ class RoomController {
   async roomset(ctx: Context) {
     let contact = await RoomService.roomset(ctx);
     success(ctx, contact)
+  }
+
+  async upload(ctx: Context){
+    let file = JSON.parse(JSON.stringify(ctx.request.files)).files;
+    const info = ['image', 'video']
+    // type类型 1信息 2图片 3视频 4文件
+    if(Array.isArray(file)) {
+      file.map(item => {
+        item.info = item.type;
+        const num = info.indexOf(item.type.split('/')[0])
+        let type = 2
+        if(num == -1) type = 4
+        if(num == 1) type = 3
+        item.type = type
+        const filePath = item.path.split('uploads')[1].replace(/\\/g, '/')
+        item.path = config.server.url + filePath
+      })
+    } else {
+      file.info = file.type;
+      const num = info.indexOf(file.type.split('/')[0])
+      let type = 2
+      if(num == -1) type = 4
+      if(num == 1) type = 3
+      file.type = type
+      const filePath = file.path.split('uploads')[1].replace(/\\/g, '/')
+      file.path = config.server.url + filePath
+      file = [file]
+    }
+    success(ctx, file)
   }
 }
 

@@ -12,5 +12,6 @@ router.get('/:id', RoomController.show)
 router.put('/:id', RoomController.update)
 router.post('/store', RoomController.store)
 router.put('/:id/roomset', RoomController.roomset)
+router.post('/upload', RoomController.upload)
 
 export default router

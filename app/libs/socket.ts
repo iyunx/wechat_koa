@@ -34,8 +34,11 @@ const socket = (io: Server) => {
   })
 
   io.on('connection', async socket => {
-    // @ts-ignore
-    // let me = socket.me as unknown as {id: number, name: string, avatar: string}
+    // https://socket.io/docs/v4/emit-cheatsheet/
+    // 消息群发，自己除外
+    // socket.broadcast.emit('message', data)
+    // 仅发自己
+    // socket.emit('message', data)
     let me = Reflect.get(socket, 'me') as {id: number, name: string, avatar: string}
     // userRemind 加id为好友，就发送消息给这个id
     socket.on('userRemind', (fid) => {
@@ -43,12 +46,7 @@ const socket = (io: Server) => {
       // socket.to(socket.id).emit('userRemind', me_id)
     })
 
-    socket.on('message', async (content: string, room: string, type: number) => {
-      // https://socket.io/docs/v4/emit-cheatsheet/
-      // 消息群发，自己除外
-      // socket.broadcast.emit('message', data)
-      // 仅发自己
-      // socket.emit('message', data)
+    socket.on('message', async (content: any, room: string, type: number) => {
       if(!socket.rooms.has(room)) return
       const value = {
         type,
@@ -57,9 +55,20 @@ const socket = (io: Server) => {
         user_id: type ? me.id : null,
         user: type ? { id: me.id, avatar: me.avatar, name: me.name} : null
       }
-      io.to(room).emit('message', value)
-      Reflect.deleteProperty(value, 'user')
-      ChatController.store(value)
+      if(type >=2 && type < 4) {
+        content.forEach((item: any) => {
+          value.content = {url: item.path, title: item.name, size: item.zize}
+          io.to(room).emit('message', value)
+        })
+      } else if(type == 4) {
+        content.forEach((item: any) => {
+          value.content = {url: item.path, title: item.name, size: item.zize}
+          io.to(room).emit('message', value)
+        })
+      }
+       else {
+        io.to(room).emit('message', value)
+      }
     })
     // 通过好友关系后，加入此房间
     socket.on('roomJoin', async roomId => {
