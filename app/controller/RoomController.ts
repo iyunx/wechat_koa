@@ -11,7 +11,7 @@ class RoomController {
       me.rooms.forEach((room: any) => {
         room.user = {}
         room.chat = { ...room.chats[0] }
-        room.chat.content = room.chat.content.replace(/<.+?>/g, '')
+        room.chat.type == 1 && (room.chat.content = room.chat.content.replace(/<.+?>/g, ''))
         delete room.chats
         // 数据修正
         room.Contacts.forEach((ru: any) => {
@@ -47,8 +47,8 @@ class RoomController {
       return err(ctx, '你无权访问')
     }
     let room  = (await RoomService.show(ctx))?.toJSON() as any;
-    room.users = room.users.filter((user: any) => user.id == ctx.user.id)[0]
-    room.users = room.users.Contact
+    
+    room.users = room.users.filter((user: any) => user.id == ctx.user.id)[0].Contact
     success(ctx, room)
   }
 
@@ -57,14 +57,7 @@ class RoomController {
    */
   async store(ctx: Context){
     const news = ctx.request.body
-    console.log(news);
     success(ctx, news)
-    // let ret = await Room.create({
-    // }, {include: [
-    //   {association: 'users', where: {id: ctx.user.id}},
-    //   {association: 'users', where: {id: 2}}
-    // ]})
-    // success(ctx, ret)
   }
 
   /**
@@ -81,6 +74,10 @@ class RoomController {
   }
 
   async upload(ctx: Context){
+    const room_id = ctx.request.body.room_id
+    const users = await redis.smembers(room_id)
+    if(!users.includes(ctx.user.id + '')) return err(ctx, '你不在此房间')
+
     let file = JSON.parse(JSON.stringify(ctx.request.files)).files;
     const info = ['image', 'video']
     // type类型 1信息 2图片 3视频 4文件
@@ -106,6 +103,7 @@ class RoomController {
       file.path = config.server.url + filePath
       file = [file]
     }
+    await RoomService.upload(ctx, file)
     success(ctx, file)
   }
 }

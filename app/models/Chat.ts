@@ -1,4 +1,4 @@
-import { TDb } from "./index";
+import { config, TDb } from "./index";
 import { Sequelize, Model, DataTypes } from "sequelize";
 
 export default (sequelize: Sequelize) => {
@@ -26,10 +26,33 @@ export default (sequelize: Sequelize) => {
     type: {
       type: DataTypes.TINYINT,
       defaultValue: 1,
-      comment: '消息类型 0:系统 1:文字 2:图片 3.音频 4.视频 5.音乐分享 6.链接分享'
+      comment: '消息类型 0:系统 1:文字 2:图片 3.视频 4.文件 5.音乐分享 6.链接分享'
     },
     content: {
       type: DataTypes.STRING,
+      get(){
+        if(this.getDataValue('type') == 2 || this.getDataValue('type') == 3){
+          return config.server.url + this.getDataValue('content')
+        }
+        if(this.getDataValue('type') == 4) {
+          const content = JSON.parse(this.getDataValue('content'))
+          content.url = config.server.url + content.url
+          return content
+        }
+        return this.getDataValue('content')
+      },
+      set(val: any){
+        if(this.getDataValue('type') >= 2 ){
+          if(this.getDataValue('type') <= 3 ){
+            val.includes(config.server.url) && (val = val.slice(config.server.url.length))
+            return this.setDataValue('content', val)
+          } else {
+            val.url.includes(config.server.url) && (val.url = val.url.slice(config.server.url.length))
+            return this.setDataValue('content', JSON.stringify(val))
+          }
+        }
+        this.setDataValue('content', val)
+      },
       comment: '消息内容'
     },
     state: {

@@ -11,6 +11,7 @@ import dotenv from 'dotenv'
 import moment from 'moment';
 import fs from 'fs'
 import { random } from '../utils';
+import redis from './libs/redis';
 // 默认配置，自动获取根目录的.env内容
 dotenv.config({path: path.join(__dirname, '..', '/.env')});
 
@@ -54,7 +55,7 @@ app
     formidable: {
       uploadDir: path.join(__dirname, '..', 'uploads'),
       keepExtensions: true,
-      onFileBegin(name, file){
+      async onFileBegin(name, file){
         const info = ['image', 'video']
         const num = info.indexOf(file.type.split('/')[0])
         let pathInfo = 'images'
@@ -71,6 +72,9 @@ app
         const fileName = 'wechat_' + moment().format('YMDhmmss') + '_' + random() + etx;
         file.path = `${dir}/${fileName}`
       }
+    },
+    onError(){
+
     }
   }))
   .use(router.routes())

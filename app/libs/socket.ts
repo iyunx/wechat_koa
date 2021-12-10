@@ -57,7 +57,7 @@ const socket = (io: Server) => {
       }
       if(type >=2 && type < 4) {
         content.forEach((item: any) => {
-          value.content = {url: item.path, title: item.name, size: item.zize}
+          value.content = item.path
           io.to(room).emit('message', value)
         })
       } else if(type == 4) {

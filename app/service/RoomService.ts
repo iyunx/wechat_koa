@@ -2,7 +2,7 @@ import type { Context } from "koa";
 import sq, { Op } from "sequelize";
 import { md5, random } from "../../utils";
 import redis from "../libs/redis";
-import { User, Room, Chat, Contact, sequelize } from '../models';
+import { User, Room, Chat, Contact, sequelize, config } from '../models';
 
 class RoomService {
   // 当前用户的聊天列表
@@ -134,6 +134,22 @@ class RoomService {
       })
     }
     return con
+  }
+
+  async upload(ctx: Context, file: any[]){
+    const room_id = ctx.request.body.room_id
+    
+    file.forEach(async (item: any) => {
+      // let content = ''
+      // if(item.type >= 4) content = JSON.stringify({url: item.path.slice(config.server.url.length), name: item.name})
+      // else content = item.path.slice(config.server.url.length)
+      await Chat.create({
+        room_id,
+        user_id: ctx.user.id,
+        type: item.type,
+        content: item.type == 4 ? {url: item.path, name: item.name} : item.path,
+      })
+    })
   }
 }
 
