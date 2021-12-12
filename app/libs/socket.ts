@@ -55,20 +55,16 @@ const socket = (io: Server) => {
         user_id: type ? me.id : null,
         user: type ? { id: me.id, avatar: me.avatar, name: me.name} : null
       }
-      if(type >=2 && type < 4) {
-        content.forEach((item: any) => {
-          value.content = item.path
-          io.to(room).emit('message', value)
-        })
+      if(type == 1){
+        ChatController.store(value)
+      } else if(type >=2 && type < 4) {
+        // 图片上传的时候就已经保存信息到数据库了
+        value.content = content
       } else if(type == 4) {
-        content.forEach((item: any) => {
-          value.content = {url: item.path, title: item.name, size: item.zize}
-          io.to(room).emit('message', value)
-        })
+        // 文件上传的时候就已经保存信息到数据库了
+        value.content = content
       }
-       else {
-        io.to(room).emit('message', value)
-      }
+      io.to(room).emit('message', value)
     })
     // 通过好友关系后，加入此房间
     socket.on('roomJoin', async roomId => {
