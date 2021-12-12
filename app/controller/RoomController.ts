@@ -38,18 +38,17 @@ class RoomController {
    * @returns 
    */
   async show(ctx: Context){
-    if(ctx.params.id.length != 36) {
-      return err(ctx, '你的房间ID错误')
-    }
+    if(ctx.params.id.length != 36) return err(ctx, '你的房间ID错误')
     let ids = await redis.smembers(ctx.params.id)
 
-    if(!ids.includes(ctx.user.id + '')) {
-      return err(ctx, '你无权访问')
-    }
-    let room  = (await RoomService.show(ctx))?.toJSON() as any;
-    
-    room.users = room.users.filter((user: any) => user.id == ctx.user.id)[0].Contact
-    success(ctx, room)
+    if(!ids.includes(ctx.user.id + '')) return err(ctx, '你无权访问')
+    // let room  = (await RoomService.show(ctx))?.toJSON() as any;
+    // room.users = room.users.filter((user: any) => user.id == ctx.user.id)[0].Contact
+    let rmchats = await RoomService.show(ctx)
+    rmchats.chats.rows.sort((a, b) => {
+      return Date.parse(a.getDataValue('created_at')) - Date.parse(b.getDataValue('created_at'))
+    })
+    success(ctx, rmchats)
   }
 
   /**

@@ -1,7 +1,4 @@
 import type { Context } from "koa";
-import sq, { Op } from "sequelize";
-import { md5, random } from "../../utils";
-import redis from "../libs/redis";
 import { User, Room, Chat, Contact, sequelize, config } from '../models';
 
 class RoomService {
@@ -41,29 +38,60 @@ class RoomService {
   }
   // 与某人，或某群的聊天详情页面
   async show(ctx: Context){
-    let room = await Room.findOne({
-      where: {id: ctx.params.id},
-      attributes: [],
-      include: [
-        {
-          model: Chat,
-          include: [
-            {
-              model: User,
-              attributes: ['id', 'name', 'avatar']
-            }
-          ]
-        },
-        {
-          model: User,
-          attributes: ['id'],
-          through: {
-            attributes: ['uid', 'roomset', 'rname', 'fid']
-          }
-        }
-      ]
+    const page = Number(ctx.query.page) ?? 1
+    const size = Number(ctx.query.size) ?? 20
+    const room_id = ctx.params.id
+
+    console.log(page, size)
+    // let room = await Room.findOne({
+    //   where: {id: ctx.params.id},
+    //   attributes: [],
+    //   include: [
+    //     {
+    //       model: Chat,
+    //       include: [
+    //         {
+    //           model: User,
+    //           attributes: ['id', 'name', 'avatar']
+    //         }
+    //       ]
+    //     },
+    //     {
+    //       model: User,
+    //       attributes: ['id'],
+    //       through: {
+    //         attributes: ['uid', 'roomset', 'rname', 'fid']
+    //       }
+    //     }
+    //   ],
+    // })
+
+    const chats = await Chat.findAndCountAll({
+      where: {
+        room_id
+      },
+      limit: size,
+      offset: (page - 1) * size,
+      order: [
+        ['created_at', 'DESC']
+      ],
+      include: {
+        model: User,
+        attributes: ['id', 'name', 'avatar']
+      }
     })
 
+    const friend = await Contact.findOne({
+      where: {
+        uid: ctx.user.id,
+        room_id 
+      },
+      attributes: ['uid', 'roomset', 'rname', 'fid']
+    })
+
+    // console.log('===============')
+    // console.log(chats)
+    // console.log('===============')
     // if(room) {
     //   let rom = room.toJSON() as any
     //   let me = rom.users.filter((user: any) => user.id == ctx.user.id && user.Contact.roomset.num > 0)
@@ -81,7 +109,10 @@ class RoomService {
     //   }
     // }
 
-    return room
+    return {
+      chats,
+      friend
+    }
   }
   // 查看或创建聊天房间room
   async store(ctx: Context, fid: number){
