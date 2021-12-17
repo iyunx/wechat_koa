@@ -6,7 +6,6 @@ class ChatController {
 
   }
   async store (data: any) {
-    console.log(data)
     await Chat.create(data)
   }
 

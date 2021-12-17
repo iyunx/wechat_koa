@@ -4,7 +4,6 @@ import { TDb } from "./index";
 export default (sequelize: Sequelize) => {
   class Room extends Model {
     id!: string
-    users!: any[]
 
     static associate(models: TDb){
       this.belongsToMany(models.User, {

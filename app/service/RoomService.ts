@@ -42,30 +42,6 @@ class RoomService {
     const size = Number(ctx.query.size) ?? 20
     const room_id = ctx.params.id
 
-    console.log(page, size)
-    // let room = await Room.findOne({
-    //   where: {id: ctx.params.id},
-    //   attributes: [],
-    //   include: [
-    //     {
-    //       model: Chat,
-    //       include: [
-    //         {
-    //           model: User,
-    //           attributes: ['id', 'name', 'avatar']
-    //         }
-    //       ]
-    //     },
-    //     {
-    //       model: User,
-    //       attributes: ['id'],
-    //       through: {
-    //         attributes: ['uid', 'roomset', 'rname', 'fid']
-    //       }
-    //     }
-    //   ],
-    // })
-
     const chats = await Chat.findAndCountAll({
       where: {
         room_id
@@ -86,28 +62,8 @@ class RoomService {
         uid: ctx.user.id,
         room_id 
       },
-      attributes: ['uid', 'roomset', 'rname', 'fid']
+      attributes: ['uid', 'roomset', 'rname', 'fid', 'room_id']
     })
-
-    // console.log('===============')
-    // console.log(chats)
-    // console.log('===============')
-    // if(room) {
-    //   let rom = room.toJSON() as any
-    //   let me = rom.users.filter((user: any) => user.id == ctx.user.id && user.Contact.roomset.num > 0)
-    //   if(me.length && me[0].Contact.roomset.num) {
-    //     const roomset = me[0].Contact.roomset
-    //     roomset.num = 0
-    //     await Contact.update({
-    //       roomset
-    //     }, {
-    //       where: {
-    //         uid: ctx.user.id,
-    //         room_id: ctx.params.id
-    //       }
-    //     })
-    //   }
-    // }
 
     return {
       chats,
@@ -115,7 +71,9 @@ class RoomService {
     }
   }
   // 查看或创建聊天房间room
-  async store(ctx: Context, fid: number){
+  async store(ctx: Context){
+    const fids: number[] = ctx.request.body;
+    // await Room.create()
   }
 
   async update(ctx: Context) {
