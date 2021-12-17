@@ -3,27 +3,34 @@ import { TDb } from "./index";
 
 export default (sequelize: Sequelize) => {
   class GroupUser extends Model {
-    id!: string
+    user_id!: number
+    group_id!: string
+    remark!: string
+    isTop!: boolean
+    disturb!: boolean
+    follow!: object
+    nickname!: string
+    gnick!: boolean
 
     static associate(models: TDb){
+      this.belongsTo(models.User, {
+        foreignKey: 'user_id',
+      })
 
+      this.belongsTo(models.Group, {
+        foreignKey: 'group_id',
+      })
     };
   }
   
   GroupUser.init({
-    id: {
-      type: DataTypes.UUID,
-      primaryKey: true,
-      allowNull: false,
-      defaultValue: DataTypes.UUIDV4
-    },
-    uid: {
+    user_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       comment: '用户id'
     },
     group_id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       comment: '群id'
     },

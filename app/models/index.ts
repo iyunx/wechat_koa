@@ -1,18 +1,22 @@
 import config from '../../config';
 import sequelize from '../libs/db';
+import { random } from '../../utils';
 
 import userFn from './User'
 import contactFn from './Contact'
 import remindFn from './Remind'
 import roomFn from './Room'
 import chatFn from './Chat'
-import { random } from '../../utils';
+import GroupFn from './Group';
+import GroupUserFn from './GroupUser';
 
 export const User = userFn(sequelize)
 export const Contact = contactFn(sequelize)
 export const Remind = remindFn(sequelize)
 export const Room = roomFn(sequelize)
 export const Chat = chatFn(sequelize)
+export const Group = GroupFn(sequelize)
+export const GroupUser = GroupUserFn(sequelize)
 
 export type TDb = {
   User: typeof User
@@ -20,6 +24,8 @@ export type TDb = {
   Chat: typeof Chat
   Room: typeof Room
   Contact: typeof Contact
+  Group: typeof Group
+  GroupUser: typeof GroupUser
 }
 
 const db: TDb = {
@@ -28,6 +34,8 @@ const db: TDb = {
   Remind,
   Chat,
   Room,
+  Group,
+  GroupUser
 }
 // 关联模型，执行
 User.associate(db)
@@ -35,7 +43,8 @@ Contact.associate(db)
 Remind.associate(db)
 Room.associate(db)
 Chat.associate(db)
-// RoomUser.associate(db)
+Group.associate(db)
+GroupUser.associate(db)
 
 ;(async () => await sequelize.sync())();
 

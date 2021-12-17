@@ -34,18 +34,16 @@ export default (sequelize: Sequelize) => {
         foreignKey: 'user_id'
       })
 
-      // this.hasMany(models.RoomUser, {
-      //   foreignKey: 'user_id'
-      // })
+      this.hasMany(models.GroupUser, {
+        foreignKey: 'user_id'
+      })
 
       this.hasMany(models.Contact, {
         foreignKey: 'uid'
       })
 
       this.belongsToMany(models.Room, {
-        // through: models.RoomUser,
         through: models.Contact,
-        // foreignKey: 'user_id',
         foreignKey: 'uid',
         timestamps: false
       })

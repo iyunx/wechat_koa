@@ -12,7 +12,9 @@ export default (sequelize: Sequelize) => {
     admin_ids!: string
 
     static associate(models: TDb){
-
+      this.hasMany(models.GroupUser, {
+        foreignKey: 'user_id'
+      })
     };
   }
   
