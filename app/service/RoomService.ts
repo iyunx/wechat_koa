@@ -72,7 +72,7 @@ class RoomService {
   }
   // 查看或创建聊天房间room
   async store(ctx: Context){
-    const fids: number[] = ctx.request.body;
+    // const fids: number[] = ctx.request.body;
     // await Room.create()
   }
 
