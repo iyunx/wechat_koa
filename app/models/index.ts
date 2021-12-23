@@ -8,6 +8,7 @@ import remindFn from './Remind'
 import roomFn from './Room'
 import chatFn from './Chat'
 import GroupFn from './Group';
+import GchatFn from './Gchat';
 import GroupUserFn from './GroupUser';
 
 export const User = userFn(sequelize)
@@ -16,6 +17,7 @@ export const Remind = remindFn(sequelize)
 export const Room = roomFn(sequelize)
 export const Chat = chatFn(sequelize)
 export const Group = GroupFn(sequelize)
+export const Gchat = GchatFn(sequelize)
 export const GroupUser = GroupUserFn(sequelize)
 
 export type TDb = {
@@ -25,6 +27,7 @@ export type TDb = {
   Room: typeof Room
   Contact: typeof Contact
   Group: typeof Group
+  Gchat: typeof Gchat
   GroupUser: typeof GroupUser
 }
 
@@ -35,6 +38,7 @@ const db: TDb = {
   Chat,
   Room,
   Group,
+  Gchat,
   GroupUser
 }
 // 关联模型，执行
@@ -44,6 +48,7 @@ Remind.associate(db)
 Room.associate(db)
 Chat.associate(db)
 Group.associate(db)
+Gchat.associate(db)
 GroupUser.associate(db)
 
 ;(async () => await sequelize.sync())();

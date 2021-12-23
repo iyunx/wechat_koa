@@ -1,19 +1,28 @@
 import { Sequelize, Model, DataTypes } from "sequelize";
-import { TDb } from "./index";
+import { config, TDb } from "./index";
 
 export default (sequelize: Sequelize) => {
   class Group extends Model {
     id!: string
     uid!: string
     name!: string
+    img!: string[]
     qrcode!: string
     notice!: string
     confirm!: boolean
     admin_ids!: string
+    user_ids!: number[]
 
     static associate(models: TDb){
-      this.hasMany(models.GroupUser, {
-        foreignKey: 'user_id'
+      // 群主
+      this.belongsTo(models.User, {
+        foreignKey: 'user_id',
+        as: 'leader'
+      })
+
+      this.belongsToMany(models.User, {
+        through: models.GroupUser,
+        foreignKey: 'group_id',
       })
     };
   }
@@ -25,14 +34,32 @@ export default (sequelize: Sequelize) => {
       allowNull: false,
       defaultValue: DataTypes.UUIDV4
     },
-    uid: {
+    user_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      comment: '群主'
+      comment: '群主id'
     },
     name: {
       type: DataTypes.STRING,
       comment: '群名称',
+    },
+    img: {
+      type: DataTypes.JSON,
+      get(){
+        const imgs = this.getDataValue('img')
+        imgs.forEach((img: string) => {
+          !img.includes(config.server.url) && (img = config.server.url + img)
+        })
+        return imgs
+      },
+      set(val: string[]){
+        const value: string[] = []
+        val.forEach((img: string) => {
+          img.includes(config.server.url) && value.push(img.slice(config.server.url.length))
+        })
+        this.setDataValue('img', value)
+      },
+      comment: '群头像',
     },
     qrcode: {
       type: DataTypes.STRING,
@@ -49,6 +76,10 @@ export default (sequelize: Sequelize) => {
     admin_ids: {
       type: DataTypes.JSON,
       comment: '管理员们'
+    },
+    user_ids: {
+      type: DataTypes.JSON,
+      comment: '群成员们'
     }
   }, {
     sequelize,

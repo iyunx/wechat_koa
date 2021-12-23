@@ -49,9 +49,20 @@ const getRedis = async (str: string, type = 'set') => {
   }
 }
 
+const isEquar = (arr1: number[], arr2: number[]) => {
+  let a = arr1.sort();
+  let b = arr2.sort();
+  if(a.length !== b.length) return false
+  for(let i = 0; i < a.length; i ++) {
+    if(a[i] !== b[i]) return false
+  }
+  return true
+}
+
 export {
   random,
   md5,
   ucwords,
-  getRedis
+  getRedis,
+  isEquar
 }

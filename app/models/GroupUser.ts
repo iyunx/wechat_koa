@@ -13,17 +13,16 @@ export default (sequelize: Sequelize) => {
     gnick!: boolean
 
     static associate(models: TDb){
-      this.belongsTo(models.User, {
-        foreignKey: 'user_id',
-      })
-
-      this.belongsTo(models.Group, {
-        foreignKey: 'group_id',
-      })
     };
   }
   
   GroupUser.init({
+    // id: {
+    //   type: DataTypes.INTEGER,
+    //   allowNull: false,
+    //   autoIncrement: true,
+    //   primaryKey: true
+    // },
     user_id: {
       type: DataTypes.INTEGER,
       allowNull: false,

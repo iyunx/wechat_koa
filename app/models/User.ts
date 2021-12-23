@@ -48,6 +48,11 @@ export default (sequelize: Sequelize) => {
         timestamps: false
       })
 
+      this.belongsToMany(models.Group, {
+        through: models.GroupUser,
+        foreignKey: 'user_id'
+      })
+
       this.hasMany(models.Chat, {
         foreignKey: 'user_id'
       })
