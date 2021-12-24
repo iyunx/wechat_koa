@@ -3,7 +3,7 @@ import { Op } from "sequelize";
 import { err } from "../libs";
 import { verify } from "../libs/jwt";
 import redis from '../libs/redis'
-import { Contact, Room, User } from "../models";
+import { Contact, Group, Room, User } from "../models";
 
 const AuthMiddleware = async (ctx: Context, next: Next) => {
   const token = ctx.headers.authorization;
@@ -57,6 +57,16 @@ const getMeInfo = async (ctx: Context) => {
         include: [
           {model: User, attributes: ['id'], through: {attributes: []}}
         ]
+      },
+      {
+        model: Group,
+        attributes: ['id'],
+        through: {
+          attributes: []
+        },
+        include: [
+          {model: User, attributes: ['id'], through: { attributes: []} }
+        ]
       }
     ]
   })
@@ -69,7 +79,7 @@ const getMeInfo = async (ctx: Context) => {
       await redis.sadd(`my_friend_${id}`, item.id)
     })
   }
-  // 存储房间id
+  // 存储私聊房间id
   if(i.rooms.length) {
     i.rooms.forEach(async (rom: any) => {
       // redis.del(rom.id)
@@ -77,7 +87,13 @@ const getMeInfo = async (ctx: Context) => {
       await redis.sadd(rom.id, rom.users[0].id, rom.users[1].id)
     })
   }
-  // 本人信息
+  // 群聊id
+  if(i.groups.length) {
+    i.groups.forEach(async (group: any) => {
+      await redis.sadd(`my_group_${id}`, group.id)
+      group.users.forEach(async (item: any) => await redis.sadd(group.id, item.id))
+    })
+  }
 }
 
 export default AuthMiddleware

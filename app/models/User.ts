@@ -17,7 +17,8 @@ export default (sequelize: Sequelize) => {
     Contact!: TContact
     friend!: User[]
     reminds!: TRemind[]
-    rooms!: any
+    rooms!: any[]
+    groups!: any[]
 
     // 延迟加载
     public getRooms!: BelongsToGetAssociationMixin<'rooms'>

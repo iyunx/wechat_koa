@@ -3,6 +3,7 @@ import { isEquar, md5, random } from "../../utils";
 import { success } from "../libs";
 import { Op } from 'sequelize'
 import { Group, GroupUser, User, Gchat } from '../models';
+import redis from "../libs/redis";
 
 class GroupService {
   async store(ctx: Context){
@@ -35,6 +36,10 @@ class GroupService {
       img: imgr,
       user_ids
     })
+
+    await redis.sadd(`my_group_${ctx.user.id}`, news.id)
+
+    fids.forEach(async i => await redis.sadd(news.id, i.id))
     
     return news
   }

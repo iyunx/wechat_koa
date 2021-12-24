@@ -3,6 +3,7 @@ import { verify } from './jwt';
 import redis from './redis';
 import ChatController from '../controller/ChatController'
 import moment from 'moment'
+import GchatController from '../controller/GchatController';
 
 const isJoinRoom = async (socket: Socket, roomId: string, meId: number) => {
   if(!socket.rooms.has(roomId)) {
@@ -45,8 +46,8 @@ const socket = (io: Server) => {
       socket.to(`notice_${fid}`).emit('userRemind', me.id)
       // socket.to(socket.id).emit('userRemind', me_id)
     })
-
-    socket.on('message', async (content: any, room: string, type: number) => {
+    // gr = 0 为私聊 1为群聊
+    socket.on('message', async (content: any, room: string, type: number, gr = 0) => {
       if(!socket.rooms.has(room)) return
       const value = {
         type,
@@ -56,7 +57,7 @@ const socket = (io: Server) => {
         user: type ? { id: me.id, avatar: me.avatar, name: me.name} : null
       }
       if(type == 1){
-        ChatController.store(value)
+        gr ? GchatController.store(value) : ChatController.store(value)
       } else if(type >=2 && type < 4) {
         // 图片上传的时候就已经保存信息到数据库了
         value.content = content
@@ -92,6 +93,29 @@ const socket = (io: Server) => {
       // await ChatController.contact(me.id, room)
       value.roomset = contact.roomset
       socket.to(`notice_${fid}`).emit('roomlist', value)
+    })
+    // 通知对方，群聊创立，推送消息
+    socket.on('grouplist', async (gid, type, msg) => {
+      // 未进入聊天室
+      console.log(gid)
+      isJoinRoom(socket, gid, me.id)
+
+      const now = moment().format()
+      const message = msg.trim()
+      const value = {
+        chat: {
+          content: message.length ? message : '你好，我是' + me.name,
+          type: message.length ? type : 0,
+          created_at: now
+        },
+        id: gid,
+        user: { id: me.id, avatar: me.avatar, name: me.name, created_at: now}
+      }
+      // 存储，这里可优化到redis，定时存储到数据库
+      // let contact = (await GchatController.store(gid)) as any
+      // await ChatController.contact(me.id, room)
+      const fids = await redis.smembers(gid)
+      fids.forEach(id => socket.to(`notice_${id}`).emit('grouplist', value))
     })
 
 
