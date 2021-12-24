@@ -1,5 +1,5 @@
 import type { Context } from "koa";
-import { User, Room, Chat, Contact, sequelize, config } from '../models';
+import { User, Room, Chat, Contact, sequelize, config, Group, Gchat } from '../models';
 
 class RoomService {
   // 当前用户的聊天列表
@@ -10,12 +10,12 @@ class RoomService {
       include: [
         {
           model: Room,
-          attributes: ['id'],
+          attributes: ['id', 'created_at'],
           through: { attributes: []},
           include: [
             {
               model: Contact,
-              attributes: ['uid', 'fid', 'rname', 'roomset', 'created_at'],
+              attributes: ['uid', 'fid', 'rname', 'roomset'],
               include: [ { model: User, as: 'user', attributes: ['id', 'avatar'] } ],
             },
             {
@@ -31,6 +31,23 @@ class RoomService {
           ],
           order: [
             [Chat, 'id', 'DESC']
+          ]
+        },
+        {
+          model: Group,
+          attributes: ['id', 'img', 'name', 'created_at'],
+          through: {
+            attributes: ['bg', 'num', 'remark', 'top', 'disturb', 'follow', 'nickname', 'shownick']
+          },
+          include: [
+            {
+              model: Gchat,
+              limit: 1,
+              attributes: ['id', 'content', 'type', 'created_at']
+            }
+          ],
+          order: [
+            [Gchat, 'id', 'DESC']
           ]
         }
       ]

@@ -10,7 +10,8 @@ class RoomController {
     if(me){
       me.rooms.forEach((room: any) => {
         room.user = {}
-        room.chat = { ...room.chats[0] }
+        room.isGroup = false // 私聊天
+        room.chat = { ...room.chats[0]}
         room.chat.type == 1 && (room.chat.content = room.chat.content.replace(/<.+?>/g, ''))
         delete room.chats
         // 数据修正
@@ -18,7 +19,6 @@ class RoomController {
           if(ru.uid == ctx.user.id) {
             room.user.id = ru.fid
             room.user.name = ru.rname
-            room.user.created_at = ru.created_at
             room.roomset = ru.roomset
           } else {
             room.user.avatar = ru.user.avatar
@@ -26,8 +26,17 @@ class RoomController {
         })
         delete room.Contacts
       })
+      me.groups.forEach((g: any) => {
+        g.chat = {...g.gchats[0]}
+        g.isGroup = true // 群聊天
+        g.roomset = g.group_user;
+        g.chat.type == 1 && (g.chat.content = g.chat.content.replace(/<.+?>/g, ''))
+        delete g.gchats
+        delete g.group_user
+      })
       // 排除不显示的房间
       me.rooms = me.rooms.filter((room: any) => room.roomset.state)
+      // me.groups = me.groups.filter((g: any) => g.group_user.state)
     }
     success(ctx, me)
   }

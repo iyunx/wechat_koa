@@ -5,24 +5,21 @@ export default (sequelize: Sequelize) => {
   class GroupUser extends Model {
     user_id!: number
     group_id!: string
+    num!: number
+    bg!: string
     remark!: string
-    isTop!: boolean
+    top!: boolean
     disturb!: boolean
     follow!: object
     nickname!: string
-    gnick!: boolean
+    shownick!: boolean
+    state!: boolean
 
     static associate(models: TDb){
     };
   }
   
   GroupUser.init({
-    // id: {
-    //   type: DataTypes.INTEGER,
-    //   allowNull: false,
-    //   autoIncrement: true,
-    //   primaryKey: true
-    // },
     user_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -33,11 +30,20 @@ export default (sequelize: Sequelize) => {
       allowNull: false,
       comment: '群id'
     },
+    num: {
+      type: DataTypes.TINYINT,
+      defaultValue: 0,
+      comment: '未读消息数量'
+    },
+    bg: {
+      type: DataTypes.STRING,
+      comment: '群背景图片'
+    },
     remark: {
       type: DataTypes.STRING,
       comment: '群备注 仅自己可见'
     },
-    isTop: {
+    top: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
       comment: '置顶聊天'
@@ -55,10 +61,15 @@ export default (sequelize: Sequelize) => {
       type: DataTypes.STRING,
       comment: '我在群内的昵称'
     },
-    gnick: {
+    shownick: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
       comment: '是否显示群成员昵称',
+    },
+    state: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
+      comment: '是否显示群',
     }
   }, {
     sequelize,

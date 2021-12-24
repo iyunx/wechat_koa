@@ -24,6 +24,10 @@ export default (sequelize: Sequelize) => {
         through: models.GroupUser,
         foreignKey: 'group_id',
       })
+
+      this.hasMany(models.Gchat, {
+        foreignKey: 'group_id'
+      })
     };
   }
   
@@ -47,15 +51,12 @@ export default (sequelize: Sequelize) => {
       type: DataTypes.JSON,
       get(){
         const imgs = this.getDataValue('img')
-        imgs.forEach((img: string) => {
-          !img.includes(config.server.url) && (img = config.server.url + img)
-        })
-        return imgs
+        return imgs.map((img: string) => img.includes(config.server.url) ? img : config.server.url + img)
       },
       set(val: string[]){
         const value: string[] = []
         val.forEach((img: string) => {
-          img.includes(config.server.url) && value.push(img.slice(config.server.url.length))
+          img.includes(config.server.url) ? value.push(img.slice(config.server.url.length)) : value.push(img)
         })
         this.setDataValue('img', value)
       },
