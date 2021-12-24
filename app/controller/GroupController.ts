@@ -17,7 +17,6 @@ class GroupController {
   }
 
   async show(ctx: Context){
-    
     const group = await GroupService.show(ctx)
     success(ctx, group)
   }

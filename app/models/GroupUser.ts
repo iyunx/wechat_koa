@@ -14,8 +14,12 @@ export default (sequelize: Sequelize) => {
     nickname!: string
     shownick!: boolean
     state!: boolean
+    group!: object
 
     static associate(models: TDb){
+      this.belongsTo(models.Group, {
+        foreignKey: 'group_id'
+      })
     };
   }
   

@@ -28,6 +28,10 @@ export default (sequelize: Sequelize) => {
       this.hasMany(models.Gchat, {
         foreignKey: 'group_id'
       })
+
+      this.hasMany(models.GroupUser, {
+        foreignKey: 'group_id'
+      })
     };
   }
   

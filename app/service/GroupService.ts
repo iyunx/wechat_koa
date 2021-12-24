@@ -48,23 +48,40 @@ class GroupService {
     const id = ctx.params.id
     const page = Number(ctx.query.page) || 1;
     const size = Number(ctx.query.size) || 20;
-
+    
     const chats = await Gchat.findAndCountAll({
       where: {
-        id
+        group_id: id
       },
       limit: size,
       offset: (page - 1) * size,
-      order: [
-        ['created_at', 'DESC']
-      ],
+      include: [
+        {
+          model: User,
+          attributes: ['id', 'name', 'avatar']
+        }
+      ]
+    })
+
+    const group = await GroupUser.findOne({
+      where: {
+        group_id: id,
+        user_id: ctx.user.id
+      },
+      attributes: ['bg', 'follow', 'nickname', 'num', 'state'],
       include: {
-        model: User,
-        attributes: ['id', 'name', 'avatar']
+        model: Group,
+        attributes: ['id', 'name'],
+        where: {
+          id
+        }
       }
     })
 
-    return chats
+    return {
+      ...chats,
+      group
+    }
   }
 }
 
