@@ -51,8 +51,6 @@ class RoomController {
     let ids = await redis.smembers(ctx.params.id)
 
     if(!ids.includes(ctx.user.id + '')) return err(ctx, '你无权访问')
-    // let room  = (await RoomService.show(ctx))?.toJSON() as any;
-    // room.users = room.users.filter((user: any) => user.id == ctx.user.id)[0].Contact
     let rmchats = await RoomService.show(ctx)
     rmchats.chats.rows.sort((a, b) => {
       return Date.parse(a.getDataValue('created_at')) - Date.parse(b.getDataValue('created_at'))
@@ -83,6 +81,7 @@ class RoomController {
 
   async upload(ctx: Context){
     const room_id = ctx.request.body.room_id
+    const isGroup = ctx.request.body.isGroup ? true : false;
     const users = await redis.smembers(room_id)
     if(!users.includes(ctx.user.id + '')) return err(ctx, '你不在此房间')
 
@@ -111,7 +110,7 @@ class RoomController {
       file.path = config.server.url + filePath
       file = [file]
     }
-    await RoomService.upload(ctx, file)
+    await RoomService.upload(ctx, file, isGroup)
     success(ctx, file)
   }
 }

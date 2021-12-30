@@ -15,10 +15,15 @@ export default (sequelize: Sequelize) => {
     shownick!: boolean
     state!: boolean
     group!: object
+    user!: object
 
     static associate(models: TDb){
       this.belongsTo(models.Group, {
         foreignKey: 'group_id'
+      })
+
+      this.belongsTo(models.User, {
+        foreignKey: 'user_id'
       })
     };
   }

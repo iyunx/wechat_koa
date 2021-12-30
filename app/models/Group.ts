@@ -12,6 +12,8 @@ export default (sequelize: Sequelize) => {
     confirm!: boolean
     admin_ids!: string
     user_ids!: number[]
+    group_users!: any[]
+    gchats!: any[]
 
     static associate(models: TDb){
       // 群主
@@ -74,7 +76,7 @@ export default (sequelize: Sequelize) => {
       type: DataTypes.STRING,
       comment: '群公告'
     },
-    confirm: {
+    allow: {
       type: DataTypes.BOOLEAN,
       comment: '是否只能通过群主或管理员才能要求朋友入群'
     },

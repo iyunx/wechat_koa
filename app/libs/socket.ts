@@ -23,7 +23,8 @@ const socket = (io: Server) => {
       socket.join('notice_' + met.id)
       // 自己的所有房间这里必须先加入
       let rooms = await redis.smembers(`my_room_${met.id}`)
-      socket.join([...rooms])
+      let groups = await redis.smembers(`my_group_${met.id}`)
+      socket.join([...rooms, ...groups])
       next()
     } catch (error) {
       let err = new Error()
@@ -97,25 +98,29 @@ const socket = (io: Server) => {
     // 通知对方，群聊创立，推送消息
     socket.on('grouplist', async (gid, type, msg) => {
       // 未进入聊天室
-      console.log(gid)
       isJoinRoom(socket, gid, me.id)
 
       const now = moment().format()
       const message = msg.trim()
       const value = {
         chat: {
-          content: message.length ? message : '你好，我是' + me.name,
+          content: message,
           type: message.length ? type : 0,
           created_at: now
         },
         id: gid,
+        roomset: {},
         user: { id: me.id, avatar: me.avatar, name: me.name, created_at: now}
       }
       // 存储，这里可优化到redis，定时存储到数据库
-      // let contact = (await GchatController.store(gid)) as any
-      // await ChatController.contact(me.id, room)
+      // 通知所有群友，新消息
       const fids = await redis.smembers(gid)
-      fids.forEach(id => socket.to(`notice_${id}`).emit('grouplist', value))
+      fids.forEach(async id => {
+        if(me.id == Number(id)) return;
+        const room = await GchatController.groupUser(id, gid)
+        if(room) value.roomset = room
+        socket.to(`notice_${id}`).emit('roomlist', value)
+      })
     })
 
 

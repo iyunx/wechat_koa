@@ -7,6 +7,8 @@ const router = new KoaRouter().prefix('/group');
 router.use(AuthMiddleware)
 
 router.get('/:id', GroupController.show)
+router.get('/:id/index', GroupController.index)
 router.post('/store', GroupController.store)
+router.put('/:id', GroupController.update)
 
 export default router

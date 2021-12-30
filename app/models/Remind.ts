@@ -13,6 +13,7 @@ export default (sequelize: Sequelize) => {
   class Remind extends Model {
     id!: string
     user_id!: number
+    type!: boolean
     content!: TContent
     state!: boolean;
     is_friend!: boolean;
@@ -33,6 +34,11 @@ export default (sequelize: Sequelize) => {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
       comment: '是否已读'
+    },
+    type: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
+      comment: '消息类型 1 好友申请 0 群聊申请'
     },
     content: {
       type: DataTypes.JSON,
