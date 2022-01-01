@@ -29,6 +29,7 @@ class LoginController {
     let { error } = await validator(ctx, rules)
   
     if(error && !Array.isArray(error)) return err(ctx, error.message)
+
     // 查询数据库的手机，找到账户，对比密码
     let data = await LoginService.login(ctx)
 

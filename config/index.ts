@@ -1,6 +1,6 @@
 const config = {
   server: {
-    url: 'http://localhost:8000',
+    url: 'http://192.168.2.3:8000',
     port: Number(process.env.SERVER_POST) || 8000
   },
   db: {

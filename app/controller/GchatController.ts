@@ -1,5 +1,5 @@
 import { Context } from "koa"
-import { Gchat, Contact, GroupUser } from "../models"
+import { Gchat, Contact, GroupUser, Group } from "../models"
 
 class GchatController {
   async show(Ctx: Context){

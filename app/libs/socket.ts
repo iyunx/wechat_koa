@@ -4,6 +4,7 @@ import redis from './redis';
 import ChatController from '../controller/ChatController'
 import moment from 'moment'
 import GchatController from '../controller/GchatController';
+import { Group } from '../models';
 
 const isJoinRoom = async (socket: Socket, roomId: string, meId: number) => {
   if(!socket.rooms.has(roomId)) {
@@ -86,6 +87,7 @@ const socket = (io: Server) => {
           created_at: now
         },
         id: room,
+        isGroup: false,
         roomset: {},
         user: { id: me.id, avatar: me.avatar, name: me.name, created_at: now}
       }
@@ -102,15 +104,22 @@ const socket = (io: Server) => {
 
       const now = moment().format()
       const message = msg.trim()
+      const group = await Group.findOne({
+        where: {id: gid}
+      });
       const value = {
         chat: {
-          content: message,
+          id: me.id,
+          content: message || me.name + ' 创建了群聊',
           type: message.length ? type : 0,
           created_at: now
         },
+        created_at: now,
         id: gid,
+        isGroup: true,
         roomset: {},
-        user: { id: me.id, avatar: me.avatar, name: me.name, created_at: now}
+        img: group?.img,
+        name: group?.name
       }
       // 存储，这里可优化到redis，定时存储到数据库
       // 通知所有群友，新消息
