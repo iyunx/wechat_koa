@@ -97,21 +97,20 @@ const socket = (io: Server) => {
       value.roomset = contact.roomset
       socket.to(`notice_${fid}`).emit('roomlist', value)
     })
-    // 通知对方，群聊创立，推送消息
-    socket.on('grouplist', async (gid, type, msg) => {
+    // 通知对方，1群聊创立 2邀请加入群聊，推送消息
+    socket.on('grouplist', async (gid, type, newUser: Array<{id: number, name: string}> | string) => {
       // 未进入聊天室
       isJoinRoom(socket, gid, me.id)
 
       const now = moment().format()
-      const message = msg.trim()
       const group = await Group.findOne({
         where: {id: gid}
       });
       const value = {
         chat: {
           id: me.id,
-          content: message || me.name + ' 创建了群聊',
-          type: message.length ? type : 0,
+          content: typeof newUser == 'object' ? '' : newUser,
+          type,
           created_at: now
         },
         created_at: now,
@@ -126,10 +125,27 @@ const socket = (io: Server) => {
       const fids = await redis.smembers(gid)
       fids.forEach(async id => {
         if(me.id == Number(id)) return;
-        const room = await GchatController.groupUser(id, gid)
-        if(room) value.roomset = room
+        if(typeof newUser == 'object'){
+          const u = newUser.find(item => item.id == Number(id))
+          value.chat.content = `${me.name} 邀请 ${u?.name} 加入群聊`
+        }
+        value.roomset = {
+          num: 1,
+          top: false,
+          disturb: false
+        }
         socket.to(`notice_${id}`).emit('roomlist', value)
       })
+    })
+
+    socket.on('removeUser', (romId: string, uid: number | Array<{id: number, name: string, avatar: string}>, type: boolean) => {
+      if(typeof uid == 'number'){
+        socket.to(`notice_${uid}`).emit('removeUser', romId, type)
+      } else {
+        uid.forEach(u => {
+          socket.to(`notice_${u.id}`).emit('removeUser', romId, type)
+        })
+      }
     })
 
 

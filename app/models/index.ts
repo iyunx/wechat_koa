@@ -31,6 +31,9 @@ export type TDb = {
   GroupUser: typeof GroupUser
 }
 
+export type TGroupUser = typeof GroupUser
+export type TGchat = typeof Gchat
+
 const db: TDb = {
   User,
   Contact,

@@ -1,7 +1,6 @@
 import { Context } from "koa";
 import { err, success } from "../libs";
 import redis from "../libs/redis";
-import { config, Contact, Room, User } from "../models";
 import GroupService from "../service/GroupService";
 
 
@@ -11,7 +10,7 @@ class GroupController {
     const group = await GroupService.index(ctx)
     success(ctx, group)
   }
-
+  // 创建群聊
   async store(ctx: Context){
     const fids: {id: number, name: string}[] = ctx.request.body;
     const myFriends = await redis.smembers(`my_friend_${ctx.user.id}`)
@@ -34,12 +33,21 @@ class GroupController {
     })
     success(ctx, group)
   }
-
-  async update(ctx: Context) {
-    const group = await GroupService.update(ctx)
+  /**
+   * 群聊条数等更新
+   */
+  async groupUserNum(ctx: Context) {
+    const group = await GroupService.groupUserNum(ctx)
     success(ctx, group)
   }
 
+  /**
+   * 群友的邀请，或移除群友
+   */
+   async joinGroup(ctx: Context){
+    const group = await GroupService.joinGroup(ctx)
+    success(ctx, group)
+  }
   
 }
 

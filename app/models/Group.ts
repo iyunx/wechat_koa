@@ -1,5 +1,5 @@
-import { Sequelize, Model, DataTypes } from "sequelize";
-import { config, TDb } from "./index";
+import { Sequelize, Model, DataTypes, HasManyCreateAssociationMixin } from "sequelize";
+import { config, TDb, TGroupUser, TGchat } from "./index";
 
 export default (sequelize: Sequelize) => {
   class Group extends Model {
@@ -9,11 +9,12 @@ export default (sequelize: Sequelize) => {
     img!: string[]
     qrcode!: string
     notice!: string
-    confirm!: boolean
+    allow!: boolean
     admin_ids!: string
+    user_id!: number
     user_ids!: number[]
-    group_users!: any[]
-    gchats!: any[]
+    readonly group_users!: any[]
+    readonly gchats!: any[]
 
     static associate(models: TDb){
       // 群主
@@ -78,7 +79,8 @@ export default (sequelize: Sequelize) => {
     },
     allow: {
       type: DataTypes.BOOLEAN,
-      comment: '是否只能通过群主或管理员才能要求朋友入群'
+      defaultValue: false,
+      comment: '是否只能通过群主或管理员审核后，才能入群'
     },
     admin_ids: {
       type: DataTypes.JSON,

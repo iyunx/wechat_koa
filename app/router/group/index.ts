@@ -9,6 +9,7 @@ router.use(AuthMiddleware)
 router.get('/:id', GroupController.show)
 router.get('/:id/index', GroupController.index)
 router.post('/store', GroupController.store)
-router.put('/:id', GroupController.update)
+router.put('/:id/num', GroupController.groupUserNum)
+router.put('/:id/join', GroupController.joinGroup)
 
 export default router
