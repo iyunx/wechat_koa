@@ -11,5 +11,7 @@ router.get('/:id/index', GroupController.index)
 router.post('/store', GroupController.store)
 router.put('/:id/num', GroupController.groupUserNum)
 router.put('/:id/join', GroupController.joinGroup)
+router.post('/audio', GroupController.audio)
+router.post('/video', GroupController.video)
 
 export default router

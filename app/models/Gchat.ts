@@ -30,7 +30,7 @@ export default (sequelize: Sequelize) => {
     type: {
       type: DataTypes.TINYINT,
       defaultValue: 1,
-      comment: '消息类型 0:系统 1:文字 2:图片 3.视频 4.文件 5.音乐分享 6.链接分享'
+      comment: '消息类型 0:系统 1:文字 2:图片 3.视频 4.文件 5.音乐录音 6.链接分享'
     },
     content: {
       type: DataTypes.STRING(1024),
@@ -47,7 +47,7 @@ export default (sequelize: Sequelize) => {
       },
       set(val: any){
         if(this.getDataValue('type') >= 2 ){
-          if(this.getDataValue('type') <= 3 ){
+          if(this.getDataValue('type') <= 3 || this.getDataValue('type') == 5){
             val.includes(config.server.url) && (val = val.slice(config.server.url.length))
             return this.setDataValue('content', val)
           } else {

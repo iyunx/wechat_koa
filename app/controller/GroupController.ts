@@ -1,4 +1,5 @@
 import { Context } from "koa";
+import config from "../../config";
 import { err, success } from "../libs";
 import redis from "../libs/redis";
 import GroupService from "../service/GroupService";
@@ -47,6 +48,20 @@ class GroupController {
    async joinGroup(ctx: Context){
     const group = await GroupService.joinGroup(ctx)
     success(ctx, group)
+  }
+
+  async audio(ctx: Context){
+    const file = JSON.parse(JSON.stringify(ctx.request.files)).files;
+    file.type = file.type == 'audio/webm' ? 5 : 3
+    const filePath = file.path.split('uploads')[1].replace(/\\/g, '/')
+    file.path = config.server.url + filePath
+    console.log(file)
+    await GroupService.audio(ctx, file)
+    success(ctx, file)
+  }
+
+  async video(ctx: Context){
+    console.log(ctx.request.files)
   }
   
 }

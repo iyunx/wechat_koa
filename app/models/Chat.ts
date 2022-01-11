@@ -26,7 +26,7 @@ export default (sequelize: Sequelize) => {
     type: {
       type: DataTypes.TINYINT,
       defaultValue: 1,
-      comment: '消息类型 0:系统 1:文字 2:图片 3.视频 4.文件 5.音乐分享 6.链接分享'
+      comment: '消息类型 0:系统 1:文字 2:图片 3.视频 4.文件 5.音乐录音 6.链接分享'
     },
     content: {
       type: DataTypes.STRING,

@@ -56,11 +56,12 @@ app
       uploadDir: path.join(__dirname, '..', 'uploads'),
       keepExtensions: true,
       async onFileBegin(name, file){
-        const info = ['image', 'video']
+        const info = ['image', 'video', 'audio/webm']
         const num = info.indexOf(file.type.split('/')[0])
         let pathInfo = 'images'
         if(num == -1) pathInfo = 'files';
         if(num == 1) pathInfo = 'video';
+        if(file.type == 'audio/webm') pathInfo = 'audio'
 
         const dirName = moment().format('Y/M')
         const dir = path.join(__dirname, `../uploads/${pathInfo}/${dirName}`)
@@ -68,7 +69,9 @@ app
         // 检查文件夹是否存在如果不存在则新建文件夹
         !fs.existsSync(dir) && fs.mkdirSync(dir, {recursive: true})
         // 后缀名
-        const etx = path.extname(file.name)
+        let etx = path.extname(file.name)
+        if(file.type == 'audio/webm') etx = '.mp3'
+
         const fileName = 'wechat_' + moment().format('YMDhmmss') + '_' + random() + etx;
         file.path = `${dir}/${fileName}`
       }

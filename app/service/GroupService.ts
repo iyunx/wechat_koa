@@ -2,7 +2,7 @@ import type { Context } from "koa";
 import { isEquar, md5, random } from "../../utils";
 import { success } from "../libs";
 import { Op } from 'sequelize'
-import { Group, GroupUser, User, Gchat } from '../models';
+import { Group, GroupUser, User, Gchat, Chat } from '../models';
 import redis from "../libs/redis";
 
 class GroupService {
@@ -229,6 +229,25 @@ class GroupService {
       return group
     }
     return null
+  }
+
+  async audio(ctx: Context, file: {size: number, path: string, type: number, mtime: Date}){
+    const room_id: string = ctx.request.body.room_id
+    const isGroup: boolean = ctx.request.body.isGroup ? true : false
+    isGroup ? 
+      await Gchat.create({
+        group_id: room_id,
+        user_id: ctx.user.id,
+        type: file.type,
+        content: file.path
+      })
+    :
+      await Chat.create({
+        room_id,
+        user_id: ctx.user.id,
+        type: file.type,
+        content: file.path
+      })
   }
 
   

@@ -84,7 +84,6 @@ class RoomController {
     const isGroup = ctx.request.body.isGroup ? true : false;
     const users = await redis.smembers(room_id)
     if(!users.includes(ctx.user.id + '')) return err(ctx, '你不在此房间')
-
     let file = JSON.parse(JSON.stringify(ctx.request.files)).files;
     const info = ['image', 'video']
     // type类型 1信息 2图片 3视频 4文件
