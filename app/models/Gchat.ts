@@ -35,7 +35,7 @@ export default (sequelize: Sequelize) => {
     content: {
       type: DataTypes.STRING(1024),
       get(){
-        if(this.getDataValue('type') == 2 || this.getDataValue('type') == 3){
+        if(this.getDataValue('type') == 2 || this.getDataValue('type') == 3 || this.getDataValue('type') == 5){
           return config.server.url + this.getDataValue('content')
         }
         if(this.getDataValue('type') == 4) {
