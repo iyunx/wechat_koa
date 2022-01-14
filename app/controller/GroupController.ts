@@ -52,10 +52,9 @@ class GroupController {
 
   async audio(ctx: Context){
     const file = JSON.parse(JSON.stringify(ctx.request.files)).files;
-    file.type = file.type == 'audio/webm' ? 5 : 3
+    file.type = (file.type as string).includes('audio') ? 5 : 3
     const filePath = file.path.split('uploads')[1].replace(/\\/g, '/')
     file.path = config.server.url + filePath
-    console.log(file)
     await GroupService.audio(ctx, file)
     success(ctx, file)
   }

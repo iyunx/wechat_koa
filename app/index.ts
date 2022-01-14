@@ -56,12 +56,12 @@ app
       uploadDir: path.join(__dirname, '..', 'uploads'),
       keepExtensions: true,
       async onFileBegin(name, file){
-        const info = ['image', 'video', 'audio/webm']
+        const info = ['image', 'video']
         const num = info.indexOf(file.type.split('/')[0])
         let pathInfo = 'images'
         if(num == -1) pathInfo = 'files';
         if(num == 1) pathInfo = 'video';
-        if(file.type == 'audio/webm') pathInfo = 'audio'
+        if(file.type.includes('audio')) pathInfo = 'audio'
 
         const dirName = moment().format('Y/M')
         const dir = path.join(__dirname, `../uploads/${pathInfo}/${dirName}`)
@@ -70,7 +70,7 @@ app
         !fs.existsSync(dir) && fs.mkdirSync(dir, {recursive: true})
         // 后缀名
         let etx = path.extname(file.name)
-        if(file.type == 'audio/webm') etx = '.mp3'
+        if(file.type.includes('audio')) etx = '.mp3'
 
         const fileName = 'wechat_' + moment().format('YMDhmmss') + '_' + random() + etx;
         file.path = `${dir}/${fileName}`

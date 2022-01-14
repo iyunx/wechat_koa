@@ -56,17 +56,19 @@ const socket = (io: Server) => {
         content,
         room_id: room,
         user_id: type ? me.id : null,
-        user: type ? { id: me.id, avatar: me.avatar, name: me.name} : null
+        user: type ? { id: me.id, avatar: me.avatar, name: me.name} : null,
+        isGroup: gr ? true : false
       }
       if(type == 1){
         gr ? GchatController.store(value) : ChatController.store(value)
-      } else if(type >=2 && type < 4) {
-        // 图片上传的时候就已经保存信息到数据库了
-        value.content = content
-      } else if(type == 4) {
-        // 文件上传的时候就已经保存信息到数据库了
-        value.content = content
       }
+      // 图片上传的时候就已经保存信息到数据库了
+      if(type >=2 && type < 4) value.content = content
+      // 文件上传的时候就已经保存信息到数据库了
+      if(type == 4) value.content = content
+      // 语音上传的时候就已经保存信息到数据库了
+      if(type == 5) value.content = content.path
+
       io.to(room).emit('message', value)
     })
     // 通过好友关系后，加入此房间
@@ -97,7 +99,7 @@ const socket = (io: Server) => {
       value.roomset = contact.roomset
       socket.to(`notice_${fid}`).emit('roomlist', value)
     })
-    // 通知对方，1群聊创立 2邀请加入群聊，推送消息
+    // 通知对方，1群聊创立 2邀请加入群聊，推送消息 我也懵逼了
     socket.on('grouplist', async (gid, type, newUser: Array<{id: number, name: string}> | string) => {
       // 未进入聊天室
       isJoinRoom(socket, gid, me.id)
