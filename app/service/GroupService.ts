@@ -1,9 +1,10 @@
 import type { Context } from "koa";
 import { isEquar, md5, random } from "../../utils";
-import { success } from "../libs";
+import { err, success } from "../libs";
 import { Op } from 'sequelize'
 import { Group, GroupUser, User, Gchat, Chat, Contact } from '../models';
 import redis from "../libs/redis";
+import moment from "moment";
 
 class GroupService {
   // 群管理首页
@@ -72,6 +73,41 @@ class GroupService {
       await redis.sadd(`my_group_${i}`, news.id)
     })
     return news
+  }
+
+  async update(ctx: Context){
+    const name = ctx.request.body.name
+    const notice = ctx.request.body.notice
+
+    const group = await Group.findOne({
+      where: {
+        id: ctx.params.id
+      }
+    })
+
+    if(!group) return err(ctx, '群不存在')
+
+    if(name){
+      if(group.user_id != ctx.user.id || (group.admin_ids && !group.admin_ids.includes(ctx.user.id))) {
+        return err(ctx, '只有管理员可以修改群名称')
+      }
+      name != group.name && (group.name = name)
+    }
+    
+    if(notice){
+      if(group.user_id != ctx.user.id || (group.admin_ids && !group.admin_ids.includes(ctx.user.id))) {
+        return err(ctx, '只有管理员可以发布群公告')
+      }
+      group.notice = {
+        id: ctx.user.id,
+        content: notice,
+        created_at: moment().format('YYYY-MM-DD HH:mm')
+      }
+    }
+
+    group.save()
+      
+    return success(ctx, group)
   }
 
   async show(ctx: Context){

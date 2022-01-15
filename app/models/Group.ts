@@ -1,5 +1,11 @@
 import { Sequelize, Model, DataTypes, HasManyCreateAssociationMixin } from "sequelize";
-import { config, TDb, TGroupUser, TGchat } from "./index";
+import { config, TDb } from "./index";
+
+type TNotice = {
+  id: number,
+  created_at: string,
+  content: string
+}
 
 export default (sequelize: Sequelize) => {
   class Group extends Model {
@@ -8,7 +14,7 @@ export default (sequelize: Sequelize) => {
     name!: string
     img!: string[]
     qrcode!: string
-    notice!: string
+    notice!: TNotice
     allow!: boolean
     admin_ids!: string
     user_id!: number
@@ -74,7 +80,7 @@ export default (sequelize: Sequelize) => {
       comment: '群二维码'
     },
     notice: {
-      type: DataTypes.STRING,
+      type: DataTypes.JSON,
       comment: '群公告'
     },
     allow: {
