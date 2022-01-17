@@ -54,8 +54,8 @@ class GroupController {
   /**
    * 群聊条数等更新
    */
-  async groupUserNum(ctx: Context) {
-    const group = await GroupService.groupUserNum(ctx)
+  async groupUser(ctx: Context) {
+    const group = await GroupService.groupUser(ctx)
     success(ctx, group)
   }
 

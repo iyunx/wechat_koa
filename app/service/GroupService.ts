@@ -137,7 +137,7 @@ class GroupService {
         group_id,
         user_id: ctx.user.id
       },
-      attributes: ['bg', 'follow', 'nickname', 'num', 'state'],
+      attributes: ['bg', 'follow', 'nickname', 'num', 'state', 'remark'],
       include: {
         model: Group,
         attributes: ['id', 'name'],
@@ -154,18 +154,26 @@ class GroupService {
   }
 
 
-  async groupUserNum(ctx: Context){
+  async groupUser(ctx: Context){
+    const {num, top, remark, disturb, shownick, nickname} = ctx.request.body
     const gu = await GroupUser.findOne({
       where: {
         group_id: ctx.params.id,
         user_id: ctx.user.id
       },
-      attributes: ['group_id', 'user_id', 'num', 'top', 'state'],
+      attributes: ['group_id', 'user_id', 'num', 'top', 'state', 'remark', 'disturb', 'shownick', 'nickname'],
     })
+    // console.log(ctx.query)
+    // console.log(ctx.params)
+    // console.log(ctx.request.body)
 
     if(gu) {
-      ctx.query.num != undefined && (gu.num = Number(ctx.query.num as string))
-      ctx.query.top != undefined && (gu.top = ctx.query.top == 'true' ? true : false)
+      num != undefined && (gu.num = num)
+      top != undefined && (gu.top = top)
+      remark != undefined && (gu.remark = remark)
+      disturb != undefined && (gu.disturb = disturb)
+      shownick != undefined && (gu.shownick = shownick)
+      nickname != undefined && (gu.nickname = nickname)
       gu.state = true
       ctx.query.state != undefined && (gu.state = false)
       gu.save()
