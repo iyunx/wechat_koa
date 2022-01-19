@@ -16,7 +16,7 @@ export default (sequelize: Sequelize) => {
     qrcode!: string
     notice!: TNotice
     allow!: boolean
-    admin_ids!: string
+    admin_ids!: number[] | null
     user_id!: number
     user_ids!: number[]
     readonly group_users!: any[]

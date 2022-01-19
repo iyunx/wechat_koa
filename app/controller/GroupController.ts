@@ -23,8 +23,7 @@ class GroupController {
   }
 
   async update(ctx: Context){
-    const name = ctx.request.body.name
-    const notice = ctx.request.body.notice
+    const {name, notice} = ctx.request.body
     
     if(name != undefined && (name.length >= 20 || !name.length)) {
       return err(ctx, '群名称太长了')
@@ -34,8 +33,6 @@ class GroupController {
       return err(ctx, '群公告超过120字符，或不能为空')
     }
 
-    if(!name && !notice) return err(ctx, '什么都没有变更')
-    
     return await GroupService.update(ctx)
   }
 

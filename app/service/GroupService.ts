@@ -76,8 +76,7 @@ class GroupService {
   }
 
   async update(ctx: Context){
-    const name = ctx.request.body.name
-    const notice = ctx.request.body.notice
+    const {name, notice, allow, adminIds} = ctx.request.body
 
     const group = await Group.findOne({
       where: {
@@ -86,23 +85,28 @@ class GroupService {
     })
 
     if(!group) return err(ctx, '群不存在')
-
-    if(name){
-      if(group.user_id != ctx.user.id || (group.admin_ids && !group.admin_ids.includes(ctx.user.id))) {
-        return err(ctx, '只有管理员可以修改群名称')
-      }
-      name != group.name && (group.name = name)
-    }
     
-    if(notice){
-      if(group.user_id != ctx.user.id || (group.admin_ids && !group.admin_ids.includes(ctx.user.id))) {
-        return err(ctx, '只有管理员可以发布群公告')
-      }
-      group.notice = {
-        id: ctx.user.id,
-        content: notice,
-        created_at: moment().format('YYYY-MM-DD HH:mm')
-      }
+    if(!this.isAdmin(ctx.user.id, group.user_id, group.admin_ids)) {
+      return err(ctx, '您无权操作')
+    }
+
+    name && name != group.name && (group.name = name)
+    
+    notice && (group.notice = {
+      id: ctx.user.id,
+      content: notice,
+      created_at: moment().format('YYYY-MM-DD HH:mm')
+    })
+
+    if(allow != undefined){
+      if(group.user_id != ctx.user.id) return err(ctx, '只有群主才能操作')
+      group.allow = allow
+    }
+
+    if(adminIds){
+      if(group.user_id != ctx.user.id) return err(ctx, '只有群主才能操作')
+      const ads = (adminIds as number[]).filter(item => item != ctx.user.id)
+      group.admin_ids = ads.length ? ads : null
     }
 
     group.save()
@@ -194,14 +198,10 @@ class GroupService {
       where: { id: group_id },
       include: { model: GroupUser }
     })
-    // 明日计划
-    // 1.群主是否开启验证入群的操作
-    // 2.socket.io 私信通知好友 入群信息。此好友确定后通知群主
-    // 3.群主通过群友入群申请
     if(group){
       // 群主或管理审核后，才能入群
       if(group.allow){
-
+        console.log('审核入群')
       } else {
         // 无需审核，直接入群
         const img: Set<string> = new Set(group.img)
@@ -306,6 +306,10 @@ class GroupService {
         gu && (gu.roomset.num += 1) && gu.save()
       })
     }
+  }
+
+  isAdmin(id: number, g_uid: number, admins: number[] | null){
+    return id == g_uid ? true : admins ? admins.includes(id) ? true: false : false
   }
 
   
