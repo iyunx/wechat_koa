@@ -76,7 +76,7 @@ class GroupService {
   }
 
   async update(ctx: Context){
-    const {name, notice, allow, adminIds} = ctx.request.body
+    const {name, notice, allow, adminIds, user_id} = ctx.request.body
 
     const group = await Group.findOne({
       where: {
@@ -105,8 +105,14 @@ class GroupService {
 
     if(adminIds){
       if(group.user_id != ctx.user.id) return err(ctx, '只有群主才能操作')
-      const ads = (adminIds as number[]).filter(item => item != ctx.user.id)
+      const ads = (adminIds as number[]).filter(item => item != group.user_id)
       group.admin_ids = ads.length ? ads : null
+    }
+
+    if(user_id) {
+      if(group.user_id != ctx.user.id) return err(ctx, '只有群主才能操作')
+      group.admin_ids?.includes(user_id) && (group.admin_ids = group.admin_ids.filter(id => id != user_id));
+      group.user_id = user_id
     }
 
     group.save()
