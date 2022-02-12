@@ -5,7 +5,8 @@
   "main": "index.ts",
   "scripts": {
     "test": "jest",
-    "dev": "nodemon"
+    "dev": "nodemon",
+    "prd": "pm2 start index.ts --name wechat_koa --interpreter /www/server/nodejs/v16.14.0/bin/ts-node"
   },
   "keywords": [
     "koa",

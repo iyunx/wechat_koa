@@ -81,7 +81,7 @@ class RoomController {
 
   async upload(ctx: Context){
     const room_id = ctx.request.body.room_id
-    const isGroup = ctx.request.body.isGroup ? true : false;
+    const isGroup = ctx.request.body.isGroup.includes('true') ? true : false;
     const users = await redis.smembers(room_id)
     if(!users.includes(ctx.user.id + '')) return err(ctx, '你不在此房间')
     let file = JSON.parse(JSON.stringify(ctx.request.files)).files;

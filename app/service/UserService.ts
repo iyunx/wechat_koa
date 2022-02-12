@@ -37,29 +37,28 @@ class UserService {
    */
   async show(ctx: Context){
     let id = ctx.params.id
-    let myFriend = await redis.smembers(`my_friend_${ctx.user.id}`);
+    let ismyFriend = await redis.sismember(`my_friend_${ctx.user.id}`, id);
     // 是朋友
-    if(myFriend.includes(id)) {
+    if(ismyFriend) {
       let me = await User.findOne({
         where: {id: ctx.user.id},
         attributes: ['id', 'name'],
-        include: [
-          {
-            model: User,
-            as: 'friend',
-            where: {id},
-            attributes: ['id', 'name', 'sex', 'avatar', 'self_id'],
-            through: {
-              where: { is_out: true }
-            }
+        include: {
+          model: User,
+          as: 'friend',
+          where: {id},
+          attributes: ['id', 'name', 'sex', 'avatar', 'self_id'],
+          through: {
+            where: { is_out: true }
           }
-        ]
+        }
       })
       if(me){
         let friend = me.friend[0]
         return {friend, room: friend.Contact.room_id}
       }
-      return null
+      // 清理redis啦
+      await redis.srem(`my_friend_${ctx.user.id}`, id)
     }
     // 不是朋友
     return User.findOne({
